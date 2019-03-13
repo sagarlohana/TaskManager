@@ -1,82 +1,37 @@
 const express = require('express')
 require('./db/mongoose')
-const User = require('./models/user')
-const Task = require('./models/task')
-
+const userRouter = require('./routers/user')
+const taskRouter = require('./routers/task')
 
 const app = express()
 const port = process.env.PORT || 3000
 
 app.use(express.json())
+app.use(userRouter)
+app.use(taskRouter)
 
-app.post('/users', (req, res) => {
-    const user = new User(req.body)
-    console.log(req.body)
-    user.save().then(() => {
-        res.send(user)
-    }).catch((e) => {
-        res.status(400).send(e)
-    })
-})
+const jwt = require('jsonwebtoken')
 
-app.get('/users/:id', (req, res) => {
-    const _id = req.params.id
-    
-    User.findById(_id).then((user) => {
-        if (!user) {
-            return res.status(404).send()
-        }
+const myFunc = async () => {
+    const token = jwt.sign({ _id: 'abc123' }, 'thisismynewcourse')
+    console.log(token)
+}
 
-        res.send(user)
-    }).catch((e) => {
-        res.status(500).send()
-    })
-})
-
-app.get('/tasks/fetchAll', (req, res) => {
-    Task.find({}).then((task) => {
-        if (!task) {
-            return res.status(404).send()
-        }
-
-        res.send(task)
-    }).catch((e) => {
-        res.status(500).send()
-    })
-})
-
-app.get('/tasks/:id', (req, res) => {
-    const _id = req.params.id
-    
-    Task.findById(_id).then((task) => {
-        if (!task) {
-            return res.status(404).send()
-        }
-
-        res.send(task)
-    }).catch((e) => {
-        res.status(500).send()
-    })
-})
-
-app.get('/users', (req, res) => {
-    User.find({}).then((users) => {
-        res.send(users)
-    }).catch((e) => {
-        
-    })
-})
-
-app.post('/tasks', (req, res) => {
-    const user = new Task(req.body)
-    console.log(req.body)
-    user.save().then(() => {
-        res.send(task)
-    }).catch((e) => {
-        res.status(400).send(e)
-    })
-})
+myFunc()
 
 app.listen(port, () => {
     console.log('Server is up on port ' + port)
 })
+
+const bcrypt = require('bcryptjs')
+
+const myFunction = async () => {
+    const password = 'Red12345!'
+    const hashedPassword = await bcrypt.hash(password, 8)
+    console.log(password, hashedPassword)
+
+    const isMatch = await bcrypt.compare('Red12345!', hashedPassword)
+    console.log(isMatch)
+}
+
+myFunction()
